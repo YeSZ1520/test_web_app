@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能抽取</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .publish-time {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+        .download-btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>智能抽取</h1>
+    <div class="publish-time">发布时间: <span id="publish-date"></span></div>
+    <p>传统采集方法依赖人工编写 XPath 路径表达式，通过 Xpath 定位 HTML 节点实现数据提取。该技术起源于 XML 文档处理需求，后被广泛应用于网页结构化数据采集。其核心特征包括：规则强依赖性、技术准入门槛。</p>   
+    <p>请点击下方按钮下载文件:</p>
+    
+    <button class="download-btn" onclick="downloadFile('1.txt', '1')">下载1.txt</button>
+    <button class="download-btn" onclick="downloadFile('2.txt', '2')">下载2.txt</button>
+    
+    <script>
+        // 设置发布时间为当前时间
+        document.getElementById('publish-date').textContent = new Date().toLocaleDateString();
+        
+        // 下载文件函数
+        function downloadFile(filename, content) {
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+            element.setAttribute('download', filename);
+            
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            
+            element.click();
+            
+            document.body.removeChild(element);
+        }
+    </script>
+</body>
+</html>
