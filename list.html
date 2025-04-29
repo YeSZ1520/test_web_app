@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #list-view { margin-bottom: 20px; }
+        #item-list { list-style: none; padding: 0; }
+        #item-list li { cursor: pointer; padding: 8px; border: 1px solid #ddd; margin: 5px 0; }
+        #item-list li:hover { background: #f0f0f0; }
+        #pagination { text-align: center; margin: 20px 0; }
+        #pagination button { margin: 0 5px; padding: 5px 10px; cursor: pointer; }
+        #detail-view { padding: 20px; border: 1px solid #ccc; margin-top: 20px; display: none; }
+        #detail-view h2 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="list-view">
+            <ul id="item-list"></ul>
+            <div id="pagination"></div>
+        </div>
+        <div id="detail-view">
+            <div id="detail-content"></div>
+            <button onclick="goBack()">返回</button>
+        </div>
+    </div>
+
+    <script>
+        const data = Array.from({length:20}, (_,i)=>({
+            id: i+1,
+            title: `项目 ${i+1}`,
+            content: `这是项目 ${i+1} 的详细内容...`
+        }));
+
+        let currentPage = 1;
+        const itemsPerPage = 5;
+
+        function renderList() {
+            const start = (currentPage -1)*itemsPerPage;
+            const end = start + itemsPerPage;
+            const items = data.slice(start, end);
+            const listHTML = items.map(item => `
+                <li onclick="showDetail(${item.id})">${item.title}</li>
+            `).join('');
+            document.getElementById('item-list').innerHTML = listHTML;
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            const buttons = Array.from({length: totalPages}, (_,i)=>i+1)
+                .map(page => `<button onclick="gotoPage(${page})">${page}</button>`).join(' ');
+            document.getElementById('pagination').innerHTML = buttons;
+        }
+
+        function gotoPage(page) {
+            currentPage = page;
+            renderList();
+            // 当分页改变时重置URL
+            window.location.hash = '';
+            document.getElementById('detail-view').style.display = 'none';
+            document.getElementById('list-view').style.display = 'block';
+        }
+
+        function showDetail(id) {
+            const item = data.find(item => item.id === id);
+            document.getElementById('detail-content').innerHTML = `
+                <h2>${item.title}</h2>
+                <p>${item.content}</p>
+            `;
+            document.getElementById('list-view').style.display = 'none';
+            document.getElementById('detail-view').style.display = 'block';
+            // 更新URL
+            window.location.hash = `detail/${id}`;
+        }
+
+        function goBack() {
+            document.getElementById('list-view').style.display = 'block';
+            document.getElementById('detail-view').style.display = 'none';
+            window.location.hash = '';
+        }
+
+        // 处理URL变化
+        window.addEventListener('hashchange', function() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#detail/')) {
+                const id = parseInt(hash.split('/').pop(), 10);
+                if (!isNaN(id) && id >= 1 && id <= data.length) {
+                    showDetail(id);
+                } else {
+                    goBack();
+                }
+            } else {
+                goBack();
+            }
+        });
+
+        window.onload = function() {
+            renderList();
+            renderPagination();
+            // 初始化时检查URL
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
+        };
+    </script>
+</body>
+</html>
