@@ -48,18 +48,30 @@
 
         function renderPagination() {
             const totalPages = Math.ceil(data.length / itemsPerPage);
-            const buttons = Array.from({length: totalPages}, (_,i)=>i+1)
+            const prevButton = `<button onclick="previousPage()" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
+            const nextButton = `<button onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
+            const pageButtons = Array.from({length: totalPages}, (_,i)=>i+1)
                 .map(page => `<button onclick="gotoPage(${page})">${page}</button>`).join(' ');
-            document.getElementById('pagination').innerHTML = buttons;
+            document.getElementById('pagination').innerHTML = prevButton + ' ' + pageButtons + ' ' + nextButton;
         }
 
         function gotoPage(page) {
             currentPage = page;
             renderList();
-            // 当分页改变时重置URL
-            window.location.hash = '';
-            document.getElementById('detail-view').style.display = 'none';
-            document.getElementById('list-view').style.display = 'block';
+            renderPagination();
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                gotoPage(currentPage - 1);
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                gotoPage(currentPage + 1);
+            }
         }
 
         function showDetail(id) {
@@ -70,7 +82,6 @@
             `;
             document.getElementById('list-view').style.display = 'none';
             document.getElementById('detail-view').style.display = 'block';
-            // 更新URL
             window.location.hash = `detail/${id}`;
         }
 
@@ -80,7 +91,6 @@
             window.location.hash = '';
         }
 
-        // 处理URL变化
         window.addEventListener('hashchange', function() {
             const hash = window.location.hash;
             if (hash.startsWith('#detail/')) {
@@ -98,7 +108,6 @@
         window.onload = function() {
             renderList();
             renderPagination();
-            // 初始化时检查URL
             window.dispatchEvent(new HashChangeEvent('hashchange'));
         };
     </script>
